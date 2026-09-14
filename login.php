@@ -252,10 +252,9 @@ function redirigirSegunRol(string $rol): void
                 required
                 maxlength="150"
                 autocomplete="username"
-                <!-- htmlspecialchars repopula el campo conservando el valor si hay error,
-                     sin riesgo de XSS aunque el usuario haya escrito código HTML. -->
                 value="<?= htmlspecialchars($_POST['correo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
             >
+                        <!-- htmlspecialchars repopula el campo conservando el valor si hay error, sin riesgo de XSS aunque el usuario haya escrito código HTML. -->
         </div>
 
         <div class="form__group">
