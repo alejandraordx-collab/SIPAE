@@ -663,7 +663,7 @@ $ultimaActualizacion = date('d/m/Y H:i:s');
             </div>
             <div class="navbar__rol">Coordinador(a)</div>
         </div>
-        <a href="estudiantes.php" class="navbar__link">Estudiantes</a>
+        <a href="estudiantes.php" class="navbar__link">Estudiantes</a>        <a href="usuarios.php" class="navbar__link">Usuarios</a>
         <a href="?logout=1" class="navbar__logout">Cerrar sesión</a>
     </div>
 </nav>
