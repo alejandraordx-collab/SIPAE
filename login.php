@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Comparamos la contraseña escrita con la que está guardada
         // en la base de datos.
-        if ($usuario && $contrasena === $usuario['contrasena']) {
+        if ($usuario && password_verify($contrasena, $usuario['contrasena'])) {
 
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['nombre']     = $usuario['nombre'];
