@@ -291,7 +291,7 @@ $estudiantes = $pdo->query(
         SIPAE — Estudiantes
     </a>
     <div class="navbar__derecha">
-        <a href="dashboard_coordinador.php" class="navbar__link">← Volver al panel</a>
+        <a href="dashboard_coordinador.php" class="navbar__link">← Volver al panel</a>            <a href="usuarios.php" class="navbar__link">Usuarios</a>
         <a href="?logout=1" class="navbar__logout">Cerrar sesión</a>
     </div>
 </nav>
