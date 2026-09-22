@@ -84,11 +84,26 @@ function redirigirSegunRol(string $rol): void
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f0f4f8;
+            background: #fdf5f4;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            background: url('img/marca_agua.png') no-repeat center center;
+            background-size: contain;
+            opacity: .05;
+            pointer-events: none;
+            z-index: -1;
         }
 
         /* ---- Tarjeta principal ---- */
@@ -107,19 +122,20 @@ function redirigirSegunRol(string $rol): void
             margin-bottom: 2rem;
         }
 
-        .card__logo {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: #1a56db;
+.card__logo {
+            width: 110px;
+            height: 110px;
+            border-radius: 16px;
+            overflow: hidden;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: .75rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .10);
         }
 
-        /* Ícono SVG de escudo/libro (inline, sin dependencias externas) */
-        .card__logo svg { width: 36px; height: 36px; fill: #ffffff; }
+        /* Logo de SIPAE */
+        .card__logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         .card__title {
             font-size: 1.5rem;
@@ -172,15 +188,15 @@ function redirigirSegunRol(string $rol): void
         }
 
         .form__input:focus {
-            border-color: #1a56db;
-            box-shadow: 0 0 0 3px rgba(26, 86, 219, .15);
+            border-color: #ee7374;
+            box-shadow: 0 0 0 3px rgba(238, 115, 116, .15);
         }
 
         /* ---- Botón de submit ---- */
         .btn-primary {
             width: 100%;
             padding: .75rem;
-            background: #1a56db;
+            background: #ee7374;
             color: #ffffff;
             border: none;
             border-radius: 8px;
@@ -191,7 +207,7 @@ function redirigirSegunRol(string $rol): void
             margin-top: .5rem;
         }
 
-        .btn-primary:hover  { background: #1648c0; }
+        .btn-primary:hover  { background: #ca6263; }
         .btn-primary:active { transform: scale(.98); }
 
         /* ---- Pie de tarjeta ---- */
@@ -209,11 +225,8 @@ function redirigirSegunRol(string $rol): void
 
     <!-- Encabezado -->
     <header class="card__header">
-        <div class="card__logo" aria-hidden="true">
-            <!-- Ícono de libro/escudo (SVG inline, sin dependencias) -->
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2zm0 2.18l7 3.89V12c0 4.35-3.1 8.4-7 9.43C8.1 20.4 5 16.35 5 12V8.07l7-3.89zM11 7v6h2V7h-2zm0 8v2h2v-2h-2z"/>
-            </svg>
+        <div class="card__logo">
+            <img src="img/logo.jpg" alt="Logo de SIPAE - Colegio OEA">
         </div>
         <h1 class="card__title">SIPAE</h1>
         <p class="card__subtitle">Colegio OEA — Inicio de sesión</p>

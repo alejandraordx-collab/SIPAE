@@ -104,10 +104,13 @@ $usuarios = $pdo->query(
             --azul-claro: #eff6ff;
             --rojo: #dc2626;
             --rojo-claro: #fef2f2;
-            --gris-fondo: #f0f4f8;
+            --gris-fondo: #fdf5f4;
             --gris-borde: #e2e8f0;
             --gris-texto: #6b7280;
             --texto: #1e2a3a;
+            --rosa: #ee7374;
+            --rosa-oscuro: #ca6263;
+            --rosa-claro: #fbe3e1;
         }
 
         body {
@@ -117,8 +120,23 @@ $usuarios = $pdo->query(
             min-height: 100vh;
         }
 
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            background: url('img/marca_agua.png') no-repeat center center;
+            background-size: contain;
+            opacity: .05;
+            pointer-events: none;
+            z-index: -1;
+        }
+
         .navbar {
-            background: var(--verde);
+            background: var(--rosa);
             padding: .875rem 1.75rem;
             display: flex;
             align-items: center;
@@ -138,7 +156,7 @@ $usuarios = $pdo->query(
             text-decoration: none;
         }
 
-        .navbar__marca svg { width: 28px; height: 28px; fill: #fff; }
+        .navbar__marca img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; display: block; }
 
         .navbar__derecha { display: flex; align-items: center; gap: 1.25rem; }
 
@@ -220,8 +238,8 @@ $usuarios = $pdo->query(
 
         .campo input:focus, .campo select:focus {
             outline: none;
-            border-color: var(--verde);
-            box-shadow: 0 0 0 3px rgba(5,150,105,.12);
+            border-color: var(--rosa);
+            box-shadow: 0 0 0 3px rgba(238,115,116,.12);
         }
 
         .campo__ayuda { font-size: .75rem; color: var(--gris-texto); }
@@ -236,8 +254,8 @@ $usuarios = $pdo->query(
             color: #fff;
             margin-top: 1.25rem;
         }
-        .btn--verde { background: var(--verde); }
-        .btn--verde:hover { background: var(--verde-oscuro); }
+        .btn--verde { background: var(--rosa); }
+        .btn--verde:hover { background: var(--rosa-oscuro); }
 
         /* ── Tabla de usuarios ───────────────────────────────────────────────── */
         .tabla-wrapper { overflow-x: auto; }
@@ -316,9 +334,7 @@ $usuarios = $pdo->query(
 
 <nav class="navbar">
     <a href="dashboard_coordinador.php" class="navbar__marca">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2zm0 2.18l7 3.89V12c0 4.35-3.1 8.4-7 9.43C8.1 20.4 5 16.35 5 12V8.07l7-3.89z"/>
-        </svg>
+        <img src="img/logo.jpg" alt="Logo SIPAE">
         SIPAE — Usuarios
     </a>
     <div class="navbar__derecha">
