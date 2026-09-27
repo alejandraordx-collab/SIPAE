@@ -1,0 +1,8 @@
+{
+  "name": "SIPAE - Sistema Integral de Permanencia, Asistencia y Alimentación Escolar",
+  "description": "Sistema de información para la prevención de la deserción escolar, registro de asistencia y control del PAE en el Colegio OEA.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPAE — Panel Docente</title>
+    <meta name="description" content="Panel docente de registro y toma de asistencia - SIPAE Colegio OEA">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --azul:        #ee7374;
+            --azul-oscuro: #ca6263;
+            --azul-claro:  #2563eb;
+            --verde:       #059669;
+            --verde-claro: #d1fae5;
+            --rojo:        #dc2626;
+            --rojo-claro:  #fef2f2;
+            --naranja:     #d97706;
+            --naranja-claro:#fffbeb;
+            --gris-fondo:  #fdf5f4;
+            --gris-borde:  #e2e8f0;
+            --gris-texto:  #6b7280;
+            --texto:       #1e2a3a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--gris-fondo);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            background: url('/img/marca_agua.png') no-repeat center center;
+            background-size: contain;
+            opacity: .05;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            background: var(--azul);
+            padding: .875rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar__marca {
+            display: flex;
+            align-items: center;
+            gap: .625rem;
+            color: #fff;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .navbar__marca img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; display: block; }
+
+        .navbar__derecha { display: flex; align-items: center; gap: 1.25rem; }
+
+        .navbar__usuario {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: rgba(255,255,255,.9);
+            font-size: .875rem;
+        }
+        .navbar__nombre { font-weight: 700; }
+        .navbar__rol { font-size: .75rem; opacity: .75; }
+
+        .navbar__logout {
+            color: #fff;
+            text-decoration: none;
+            background: rgba(255,255,255,.18);
+            padding: .35rem .875rem;
+            border-radius: 6px;
+            font-size: .8rem;
+            font-weight: 600;
+            transition: background .2s;
+        }
+        .navbar__logout:hover { background: rgba(255,255,255,.30); }
+
+        .contenedor {
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 0 1.25rem;
+        }
+
+        .alerta {
+            padding: .875rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: .875rem;
+            display: flex;
+            align-items: center;
+            gap: .625rem;
+        }
+        .alerta--exito { background: var(--verde-claro); color: #065f46; border: 1px solid #a7f3d0; }
+        .alerta--error { background: var(--rojo-claro); color: var(--rojo); border: 1px solid #fecaca; }
+        .alerta svg { width: 20px; height: 20px; flex-shrink: 0; fill: currentColor; }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card__titulo {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            color: var(--texto);
+        }
+        .card__titulo svg { width: 18px; height: 18px; fill: var(--azul); }
+
+        .filtros {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filtro__grupo { display: flex; flex-direction: column; gap: .375rem; flex: 1; min-width: 140px; }
+        .filtro__label { font-size: .8rem; font-weight: 600; color: #4b5563; }
+        .filtro__select, .filtro__input {
+            padding: .625rem .75rem;
+            border: 1.5px solid var(--gris-borde);
+            border-radius: 8px;
+            font-size: .9rem;
+            color: var(--texto);
+            outline: none;
+            background: #fff;
+        }
+        .filtro__select:focus, .filtro__input:focus { border-color: var(--azul); }
+
+        .btn-cargar {
+            padding: .625rem 1.25rem;
+            background: var(--azul);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .2s;
+            height: 40px;
+        }
+        .btn-cargar:hover { background: var(--azul-oscuro); }
+
+        .seccion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: .75rem;
+            border-bottom: 2px solid var(--gris-borde);
+        }
+        .seccion-header h2 { font-size: 1.05rem; font-weight: 700; }
+
+        .badge {
+            background: #f1f5f9;
+            color: #334155;
+            padding: .25rem .75rem;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+
+        .tabla-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #f8fafc;
+            color: var(--gris-texto);
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: .75rem 1rem;
+            text-align: left;
+            border-bottom: 1.5px solid var(--gris-borde);
+        }
+        td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        td.num { width: 40px; color: var(--gris-texto); font-size: .8rem; }
+        td.nombre { font-weight: 600; font-size: .9rem; }
+
+        .radio-grupo { display: flex; gap: .375rem; }
+        .radio-grupo input[type="radio"] { display: none; }
+        .radio-grupo label {
+            display: inline-block;
+            padding: .35rem .75rem;
+            border-radius: 6px;
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: all .15s;
+            user-select: none;
+        }
+
+        .radio-grupo input[type="radio"] + label.est-asistio { border-color: var(--verde); color: var(--verde); }
+        .radio-grupo input[type="radio"]:checked + label.est-asistio { background: var(--verde); color: #fff; }
+
+        .radio-grupo input[type="radio"] + label.est-falla { border-color: var(--rojo); color: var(--rojo); }
+        .radio-grupo input[type="radio"]:checked + label.est-falla { background: var(--rojo); color: #fff; }
+
+        .radio-grupo input[type="radio"] + label.est-justificado { border-color: var(--azul-claro); color: var(--azul-claro); }
+        .radio-grupo input[type="radio"]:checked + label.est-justificado { background: var(--azul-claro); color: #fff; }
+
+        .radio-grupo input[type="radio"] + label.est-novedad { border-color: var(--naranja); color: var(--naranja); }
+        .radio-grupo input[type="radio"]:checked + label.est-novedad { background: var(--naranja); color: #fff; }
+
+        .form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 2px solid var(--gris-borde);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-guardar {
+            padding: .75rem 2rem;
+            background: var(--verde);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            transition: background .2s;
+        }
+        .btn-guardar:hover { background: #047857; }
+        .btn-guardar svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .leyenda { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+        .leyenda__item { display: flex; align-items: center; gap: .375rem; font-size: .78rem; color: var(--gris-texto); }
+        .leyenda__dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-asistio { background: var(--verde); }
+        .dot-falla { background: var(--rojo); }
+        .dot-justif { background: var(--azul-claro); }
+        .dot-novedad { background: var(--naranja); }
+
+        .vacio { text-align: center; padding: 2.5rem; color: var(--gris-texto); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/dashboard_docente" class="navbar__marca">
+        <img src="/img/logo.jpg" alt="Logo SIPAE">
+        SIPAE
+    </a>
+
+    <div class="navbar__derecha">
+        <div class="navbar__usuario">
+            <% if (cursoDirigido) { %>
+                <a href="/dashboard_docente?curso=<%= encodeURIComponent(cursoDirigido) %>" class="navbar__logout" style="background:rgba(255,255,255,.15)">
+                    Mi curso (<%= cursoDirigido %>)
+                </a>
+            <% } %>
+            <div>
+                <div class="navbar__nombre"><%= usuario.nombre %></div>
+                <div class="navbar__rol">Docente</div>
+            </div>
+        </div>
+        <a href="/logout" class="navbar__logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+<main class="contenedor">
+
+    <% if (alerta) { %>
+        <div class="alerta alerta--<%= alerta.tipo %>" role="alert">
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <%= alerta.texto %>
+        </div>
+    <% } %>
+
+    <div class="card">
+        <h2 class="card__titulo">
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L13 10.414V17a1 1 0 01-.553.894l-4 2A1 1 0 017 19v-8.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/></svg>
+            Seleccionar curso y sesión
+        </h2>
+
+        <form method="get" action="/dashboard_docente">
+            <div class="filtros">
+                <div class="filtro__grupo">
+                    <label class="filtro__label" for="curso">Curso</label>
+                    <select class="filtro__select" id="curso" name="curso" onchange="this.form.submit()" required>
+                        <option value="">— Selecciona un curso —</option>
+                        <% cursos.forEach(function(c) { %>
+                            <option value="<%= c %>" <%= (c === cursoSel) ? 'selected' : '' %>>Curso <%= c %></option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="filtro__grupo">
+                    <label class="filtro__label" for="fecha">Fecha</label>
+                    <input class="filtro__input" type="date" id="fecha" name="fecha" value="<%= fechaSel %>" required>
+                </div>
+
+                <% 
+                const horariosMilitares = [
+                    { b: 1, hora: "06:00 - 07:00", militar: "0600 - 0700", ampm: "06:00 AM - 07:00 AM" },
+                    { b: 2, hora: "07:00 - 08:00", militar: "0700 - 0800", ampm: "07:00 AM - 08:00 AM" },
+                    { b: 3, hora: "08:00 - 09:00", militar: "0800 - 0900", ampm: "08:00 AM - 09:00 AM" },
+                    { b: 4, hora: "09:00 - 10:00", militar: "0900 - 1000", ampm: "09:00 AM - 10:00 AM" },
+                    { b: 5, hora: "10:00 - 11:00", militar: "1000 - 1100", ampm: "10:00 AM - 11:00 AM" },
+                    { b: 6, hora: "11:00 - 12:00", militar: "1100 - 1200", ampm: "11:00 AM - 12:00 PM" },
+                    { b: 7, hora: "12:00 - 13:00", militar: "1200 - 1300", ampm: "12:00 PM - 01:00 PM" },
+                    { b: 8, hora: "13:00 - 14:00", militar: "1300 - 1400", ampm: "01:00 PM - 02:00 PM" },
+                    { b: 9, hora: "14:00 - 15:00", militar: "1400 - 1500", ampm: "02:00 PM - 03:00 PM" },
+                    { b: 10, hora: "15:00 - 16:00", militar: "1500 - 1600", ampm: "03:00 PM - 04:00 PM" },
+                    { b: 11, hora: "16:00 - 17:00", militar: "1600 - 1700", ampm: "04:00 PM - 05:00 PM" },
+                    { b: 12, hora: "17:00 - 18:00", militar: "1700 - 1800", ampm: "05:00 PM - 06:00 PM" }
+                ];
+                const horarioActual = horariosMilitares.find(h => h.b === bloqueSel);
+                const etiquetaHorario = horarioActual ? horarioActual.hora : `Hora ${bloqueSel}`;
+                %>
+                <div class="filtro__grupo">
+                    <label class="filtro__label" for="bloque">Hora</label>
+                    <select class="filtro__select" id="bloque" name="bloque">
+                        <% horariosMilitares.forEach(function(item) { %>
+                            <option value="<%= item.b %>" <%= (item.b === bloqueSel) ? 'selected' : '' %>>
+                                <%= item.hora %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <button class="btn-cargar" type="submit">Cargar estudiantes</button>
+            </div>
+        </form>
+
+        <div class="leyenda">
+            <span class="leyenda__item"><span class="leyenda__dot dot-asistio"></span>Asistió</span>
+            <span class="leyenda__item"><span class="leyenda__dot dot-falla"></span>Falla</span>
+            <span class="leyenda__item"><span class="leyenda__dot dot-justif"></span>Justificado</span>
+            <span class="leyenda__item"><span class="leyenda__dot dot-novedad"></span>Novedad</span>
+        </div>
+    </div>
+
+    <% if (cursoSel !== '') { %>
+        <div class="card">
+            <div class="seccion-header">
+                <h2>Asistencia — Curso <%= cursoSel %> / <%= fechaSel %> / <%= etiquetaHorario %></h2>
+                <% if (estudiantes && estudiantes.length > 0) { %>
+                    <span class="badge"><%= estudiantes.length %> estudiantes</span>
+                <% } %>
+            </div>
+
+            <% if (!estudiantes || estudiantes.length === 0) { %>
+                <div class="vacio">
+                    <p>No se encontraron estudiantes registrados en el curso <%= cursoSel %>.</p>
+                </div>
+            <% } else { %>
+                <form id="form-asistencia" method="post" action="/procesar_asistencia">
+                    <input type="hidden" name="curso" value="<%= cursoSel %>">
+                    <input type="hidden" name="fecha" value="<%= fechaSel %>">
+                    <input type="hidden" name="bloque" value="<%= bloqueSel %>">
+
+                    <div class="tabla-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Estudiante</th>
+                                    <th>Estado de asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% estudiantes.forEach(function(est, i) {
+                                    let estadoActual = asistenciaExistente[est.id] || 'asistió';
+                                %>
+                                    <tr>
+                                        <td class="num"><%= i + 1 %></td>
+                                        <td class="nombre"><%= est.nombre %></td>
+                                        <td>
+                                            <div class="radio-grupo" role="group">
+                                                <input type="radio" id="est_<%= est.id %>_asistio" name="asistencia[<%= est.id %>]" value="asistió" <%= estadoActual === 'asistió' ? 'checked' : '' %>>
+                                                <label for="est_<%= est.id %>_asistio" class="est-asistio">Asistió</label>
+
+                                                <input type="radio" id="est_<%= est.id %>_falla" name="asistencia[<%= est.id %>]" value="falla" <%= estadoActual === 'falla' ? 'checked' : '' %>>
+                                                <label for="est_<%= est.id %>_falla" class="est-falla">Falla</label>
+
+                                                <input type="radio" id="est_<%= est.id %>_justificado" name="asistencia[<%= est.id %>]" value="justificado" <%= estadoActual === 'justificado' ? 'checked' : '' %>>
+                                                <label for="est_<%= est.id %>_justificado" class="est-justificado">Justificado</label>
+
+                                                <input type="radio" id="est_<%= est.id %>_novedad" name="asistencia[<%= est.id %>]" value="novedad" <%= estadoActual === 'novedad' ? 'checked' : '' %>>
+                                                <label for="est_<%= est.id %>_novedad" class="est-novedad">Novedad</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-footer">
+                        <span style="font-size:.85rem;color:var(--gris-texto)">
+                            <%= Object.keys(asistenciaExistente).length > 0 ? '⚠️ Modificando asistencia previamente guardada.' : 'Marca el estado de cada estudiante antes de guardar.' %>
+                        </span>
+
+                        <button class="btn-guardar" type="submit">
+                            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Guardar asistencia
+                        </button>
+                    </div>
+                </form>
+            <% } %>
+        </div>
+    <% } %>
+
+</main>
+
+<script>
+(function () {
+    const form = document.getElementById('form-asistencia');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            if (!confirm('¿Desea guardar el registro de asistencia para esta sesión?')) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Sync auth token for iframes
+    const urlParams = new URLSearchParams(window.location.search);
+    const auth = urlParams.get('auth');
+    if (auth) {
+        localStorage.setItem('sipae_auth', auth);
+    }
+    const token = auth || localStorage.getItem('sipae_auth');
+    if (token) {
+        document.querySelectorAll('a[href^="/"]').forEach(function(a) {
+            const href = a.getAttribute('href');
+            if (href.startsWith('/logout')) {
+                a.addEventListener('click', function() { localStorage.removeItem('sipae_auth'); });
+                return;
+            }
+            try {
+                const u = new URL(a.href, window.location.origin);
+                if (!u.searchParams.has('auth')) {
+                    u.searchParams.set('auth', token);
+                    a.href = u.pathname + u.search + u.hash;
+                }
+            } catch(e) {}
+        });
+        document.querySelectorAll('form').forEach(function(f) {
+            if (!f.querySelector('input[name="auth"]')) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'auth';
+                inp.value = token;
+                f.appendChild(inp);
+            }
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

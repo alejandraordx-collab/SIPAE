@@ -1,7 +1,0 @@
-DirectoryIndex login.php
-Options -Indexes
-
-<FilesMatch "\.(sql|md)$">
-    Require all denied
-    </FilesMatch>
-    

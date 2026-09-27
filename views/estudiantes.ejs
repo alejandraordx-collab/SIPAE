@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPAE — Gestión de Estudiantes</title>
+    <meta name="description" content="Gestión y registro de estudiantes y acudientes - SIPAE Colegio OEA">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --verde:        #ee7374;
+            --verde-oscuro: #ca6263;
+            --azul:         #1a56db;
+            --rojo:         #dc2626;
+            --gris-fondo:   #fdf5f4;
+            --gris-borde:   #e2e8f0;
+            --gris-texto:   #6b7280;
+            --texto:        #1e2a3a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--gris-fondo);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            background: url('/img/marca_agua.png') no-repeat center center;
+            background-size: contain;
+            opacity: .05;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            background: var(--verde);
+            padding: .875rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar__marca {
+            display: flex;
+            align-items: center;
+            gap: .625rem;
+            color: #fff;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .navbar__marca img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; display: block; }
+        .navbar__derecha { display: flex; align-items: center; gap: 1.25rem; }
+
+        .navbar__link {
+            color: #fff;
+            text-decoration: none;
+            font-size: .8rem;
+            font-weight: 600;
+            opacity: .9;
+        }
+        .navbar__link:hover { opacity: 1; text-decoration: underline; }
+
+        .navbar__logout {
+            color: #fff;
+            text-decoration: none;
+            background: rgba(255,255,255,.18);
+            padding: .35rem .875rem;
+            border-radius: 6px;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .contenedor {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.25rem;
+        }
+
+        .alerta {
+            padding: .875rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: .875rem;
+        }
+        .alerta--exito { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alerta--error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .grid-formularios {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            padding: 1.5rem;
+        }
+
+        .card__titulo {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: .8rem; font-weight: 600; color: #374151; margin-bottom: .25rem; }
+        .form-input {
+            width: 100%;
+            padding: .6rem .8rem;
+            border: 1.5px solid var(--gris-borde);
+            border-radius: 8px;
+            font-size: .9rem;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--verde); }
+
+        .btn-submit {
+            width: 100%;
+            padding: .65rem;
+            background: var(--verde);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: .5rem;
+        }
+        .btn-submit:hover { background: var(--verde-oscuro); }
+
+        table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+        th {
+            background: #f8fafc;
+            color: var(--gris-texto);
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: .75rem 1rem;
+            text-align: left;
+            border-bottom: 1.5px solid var(--gris-borde);
+        }
+        td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+        @media (max-width: 768px) {
+            .grid-formularios { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/dashboard_coordinador" class="navbar__marca">
+        <img src="/img/logo.jpg" alt="Logo SIPAE">
+        SIPAE
+    </a>
+
+    <div class="navbar__derecha">
+        <a href="/dashboard_coordinador" class="navbar__link">Panel Principal</a>
+        <a href="/usuarios" class="navbar__link">Usuarios</a>
+        <a href="/logout" class="navbar__logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+<main class="contenedor">
+
+    <% if (alerta) { %>
+        <div class="alerta alerta--<%= alerta.tipo %>" role="alert">
+            <%= alerta.texto %>
+        </div>
+    <% } %>
+
+    <div class="grid-formularios">
+        <!-- Formulario Manual -->
+        <div class="card">
+            <h2 class="card__titulo">Agregar Estudiante Manualmente</h2>
+            <form method="post" action="/procesar_estudiante">
+                <div class="form-group">
+                    <label class="form-label" for="nombre">Nombre completo del estudiante</label>
+                    <input class="form-input" type="text" id="nombre" name="nombre" required placeholder="Ej. Camila Morales">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="curso">Curso</label>
+                    <input class="form-input" type="text" id="curso" name="curso" required placeholder="Ej. 601, 701, 1101">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="nombre_acudiente">Nombre del acudiente</label>
+                    <input class="form-input" type="text" id="nombre_acudiente" name="nombre_acudiente" required placeholder="Ej. Mario Morales">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="parentesco_acudiente">Parentesco</label>
+                    <input class="form-input" type="text" id="parentesco_acudiente" name="parentesco_acudiente" required placeholder="Madre, Padre, etc.">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="whatsapp_acudiente">WhatsApp acudiente</label>
+                    <input class="form-input" type="tel" id="whatsapp_acudiente" name="whatsapp_acudiente" required placeholder="3101234567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="correo_acudiente">Correo acudiente</label>
+                    <input class="form-input" type="email" id="correo_acudiente" name="correo_acudiente" required placeholder="acudiente@gmail.com">
+                </div>
+                <button class="btn-submit" type="submit">Guardar Estudiante</button>
+            </form>
+        </div>
+
+        <!-- Carga Masiva CSV -->
+        <div class="card">
+            <h2 class="card__titulo">Carga Masiva (CSV / Texto)</h2>
+            <p style="font-size:.8rem;color:var(--gris-texto);margin-bottom:1rem">
+                Formato por fila: <code>nombre,curso,acudiente,parentesco,whatsapp,correo</code>
+            </p>
+            <form method="post" action="/cargar_estudiantes" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label" for="archivo">Archivo CSV o TXT</label>
+                    <input class="form-input" type="file" id="archivo" name="archivo" accept=".csv,.txt">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="texto_csv">O pegar líneas de texto:</label>
+                    <textarea class="form-input" id="texto_csv" name="texto_csv" rows="6" placeholder="Juan Perez,601,Ana Perez,Madre,3101112233,ana@mail.com&#10;Lucia Gomez,701,Carlos Gomez,Padre,3104445566,carlos@mail.com"></textarea>
+                </div>
+                <button class="btn-submit" type="submit">Procesar Carga Masiva</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Estudiantes -->
+    <div class="card">
+        <h2 class="card__titulo">Listado de Estudiantes Activos (<%= estudiantes.length %>)</h2>
+        <div style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Curso</th>
+                        <th>Acudiente</th>
+                        <th>Parentesco</th>
+                        <th>WhatsApp</th>
+                        <th>Correo Acudiente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% estudiantes.forEach(function(est, i) { %>
+                        <tr>
+                            <td style="color:var(--gris-texto)"><%= i + 1 %></td>
+                            <td><strong><%= est.nombre %></strong></td>
+                            <td><span style="background:#f1f5f9;padding:.2rem .5rem;border-radius:4px;font-weight:600"><%= est.curso %></span></td>
+                            <td><%= est.nombre_acudiente %></td>
+                            <td><%= est.parentesco_acudiente %></td>
+                            <td><%= est.whatsapp_acudiente %></td>
+                            <td><%= est.correo_acudiente %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<script>
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const auth = urlParams.get('auth');
+    if (auth) {
+        localStorage.setItem('sipae_auth', auth);
+    }
+    const token = auth || localStorage.getItem('sipae_auth');
+    if (token) {
+        document.querySelectorAll('a[href^="/"]').forEach(function(a) {
+            const href = a.getAttribute('href');
+            if (href.startsWith('/logout')) {
+                a.addEventListener('click', function() { localStorage.removeItem('sipae_auth'); });
+                return;
+            }
+            try {
+                const u = new URL(a.href, window.location.origin);
+                if (!u.searchParams.has('auth')) {
+                    u.searchParams.set('auth', token);
+                    a.href = u.pathname + u.search + u.hash;
+                }
+            } catch(e) {}
+        });
+        document.querySelectorAll('form').forEach(function(f) {
+            if (!f.querySelector('input[name="auth"]')) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'auth';
+                inp.value = token;
+                f.appendChild(inp);
+            }
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

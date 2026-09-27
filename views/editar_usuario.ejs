@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPAE — Editar Usuario</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fdf5f4;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            margin: 1rem;
+        }
+        .card__titulo { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e2a3a; }
+        .form-group { margin-bottom: 1.15rem; }
+        .form-label { display: block; font-size: .82rem; font-weight: 600; color: #374151; margin-bottom: .35rem; }
+        .form-input, .form-select {
+            width: 100%;
+            padding: .65rem .85rem;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: .95rem;
+            outline: none;
+            background: #fff;
+        }
+        .form-input:focus, .form-select:focus { border-color: #ee7374; }
+        .btn-submit {
+            width: 100%;
+            padding: .75rem;
+            background: #ee7374;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn-submit:hover { background: #ca6263; }
+        .alerta-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: .75rem;
+            border-radius: 8px;
+            font-size: .85rem;
+            margin-bottom: 1.25rem;
+        }
+        .btn-cancelar {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: .85rem;
+            color: #6b7280;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1 class="card__titulo">Editar Cuenta de Usuario</h1>
+
+    <% if (error) { %>
+        <div class="alerta-error"><%= error %></div>
+    <% } %>
+
+    <form method="post" action="/procesar_editar_usuario">
+        <input type="hidden" name="id" value="<%= usuarioEditar.id %>">
+
+        <div class="form-group">
+            <label class="form-label" for="nombre">Nombre completo</label>
+            <input class="form-input" type="text" id="nombre" name="nombre" value="<%= usuarioEditar.nombre %>" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="correo">Correo institucional</label>
+            <input class="form-input" type="email" id="correo" name="correo" value="<%= usuarioEditar.correo %>" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="rol">Rol</label>
+            <select class="form-select" id="rol" name="rol" <%= esUsuarioActual ? 'disabled' : '' %>>
+                <option value="docente" <%= usuarioEditar.rol === 'docente' ? 'selected' : '' %>>Docente</option>
+                <option value="coordinador" <%= usuarioEditar.rol === 'coordinador' ? 'selected' : '' %>>Coordinador(a)</option>
+            </select>
+            <% if (esUsuarioActual) { %>
+                <input type="hidden" name="rol" value="<%= usuarioEditar.rol %>">
+                <span style="font-size:.72rem;color:#6b7280">No puedes cambiar tu propio rol.</span>
+            <% } %>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="curso_dirigido">Curso dirigido (solo docentes)</label>
+            <select class="form-select" id="curso_dirigido" name="curso_dirigido">
+                <option value="">— Ninguno —</option>
+                <% cursos.forEach(function(c) { %>
+                    <option value="<%= c %>" <%= usuarioEditar.curso_dirigido === c ? 'selected' : '' %>>Curso <%= c %></option>
+                <% }); %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="contrasena">Nueva contraseña (opcional)</label>
+            <input class="form-input" type="password" id="contrasena" name="contrasena" placeholder="Dejar en blanco para conservar actual">
+        </div>
+
+        <button class="btn-submit" type="submit">Guardar Cambios</button>
+        <a href="/usuarios" class="btn-cancelar">← Cancelar y volver</a>
+    </form>
+</div>
+
+<script>
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const auth = urlParams.get('auth');
+    if (auth) {
+        localStorage.setItem('sipae_auth', auth);
+    }
+    const token = auth || localStorage.getItem('sipae_auth');
+    if (token) {
+        document.querySelectorAll('a[href^="/"]').forEach(function(a) {
+            const href = a.getAttribute('href');
+            if (href.startsWith('/logout')) {
+                a.addEventListener('click', function() { localStorage.removeItem('sipae_auth'); });
+                return;
+            }
+            try {
+                const u = new URL(a.href, window.location.origin);
+                if (!u.searchParams.has('auth')) {
+                    u.searchParams.set('auth', token);
+                    a.href = u.pathname + u.search + u.hash;
+                }
+            } catch(e) {}
+        });
+        document.querySelectorAll('form').forEach(function(f) {
+            if (!f.querySelector('input[name="auth"]')) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'auth';
+                inp.value = token;
+                f.appendChild(inp);
+            }
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

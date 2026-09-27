@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPAE — Usuarios</title>
+    <meta name="description" content="Gestión de cuentas de docentes y coordinadores - SIPAE Colegio OEA">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --verde: #059669;
+            --verde-oscuro: #047857;
+            --azul: #1a56db;
+            --rojo: #dc2626;
+            --gris-fondo: #fdf5f4;
+            --gris-borde: #e2e8f0;
+            --gris-texto: #6b7280;
+            --texto: #1e2a3a;
+            --rosa: #ee7374;
+            --rosa-oscuro: #ca6263;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--gris-fondo);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            background: url('/img/marca_agua.png') no-repeat center center;
+            background-size: contain;
+            opacity: .05;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            background: var(--rosa);
+            padding: .875rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar__marca {
+            display: flex;
+            align-items: center;
+            gap: .625rem;
+            color: #fff;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .navbar__marca img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; display: block; }
+        .navbar__derecha { display: flex; align-items: center; gap: 1.25rem; }
+
+        .navbar__link {
+            color: #fff;
+            text-decoration: none;
+            font-size: .8rem;
+            font-weight: 600;
+            opacity: .9;
+        }
+        .navbar__link:hover { opacity: 1; text-decoration: underline; }
+
+        .navbar__logout {
+            color: #fff;
+            text-decoration: none;
+            background: rgba(255,255,255,.18);
+            padding: .35rem .875rem;
+            border-radius: 6px;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .contenedor { max-width: 1100px; margin: 2rem auto; padding: 0 1.25rem; }
+
+        .alerta {
+            padding: .875rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: .875rem;
+        }
+        .alerta--exito { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alerta--error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            padding: 1.5rem;
+        }
+
+        .card__titulo {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: .8rem; font-weight: 600; color: #374151; margin-bottom: .25rem; }
+        .form-input, .form-select {
+            width: 100%;
+            padding: .6rem .8rem;
+            border: 1.5px solid var(--gris-borde);
+            border-radius: 8px;
+            font-size: .9rem;
+            outline: none;
+            background: #fff;
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--rosa); }
+
+        .btn-submit {
+            width: 100%;
+            padding: .65rem;
+            background: var(--rosa);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: .5rem;
+        }
+        .btn-submit:hover { background: var(--rosa-oscuro); }
+
+        table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+        th {
+            background: #f8fafc;
+            color: var(--gris-texto);
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: .75rem 1rem;
+            text-align: left;
+            border-bottom: 1.5px solid var(--gris-borde);
+        }
+        td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+        .badge {
+            display: inline-block;
+            padding: .2rem .6rem;
+            border-radius: 12px;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .badge--docente { background: #eff6ff; color: #1d4ed8; }
+        .badge--coordinador { background: #fef3c7; color: #b45309; }
+        .badge--activo { background: #d1fae5; color: #047857; }
+        .badge--inactivo { background: #fee2e2; color: #b91c1c; }
+
+        .btn-accion {
+            padding: .3rem .6rem;
+            border-radius: 6px;
+            font-size: .75rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-editar { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+        .btn-toggle { background: transparent; border-color: #cbd5e1; }
+
+        @media (max-width: 850px) {
+            .grid-2col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/dashboard_coordinador" class="navbar__marca">
+        <img src="/img/logo.jpg" alt="Logo SIPAE">
+        SIPAE
+    </a>
+
+    <div class="navbar__derecha">
+        <a href="/dashboard_coordinador" class="navbar__link">Panel Principal</a>
+        <a href="/estudiantes" class="navbar__link">Estudiantes</a>
+        <a href="/logout" class="navbar__logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+<main class="contenedor">
+
+    <% if (alerta) { %>
+        <div class="alerta alerta--<%= alerta.tipo %>" role="alert">
+            <%= alerta.texto %>
+        </div>
+    <% } %>
+
+    <div class="grid-2col">
+        <!-- Formulario Crear Usuario -->
+        <div class="card">
+            <h2 class="card__titulo">Crear Nuevo Usuario</h2>
+            <form method="post" action="/procesar_usuario">
+                <div class="form-group">
+                    <label class="form-label" for="nombre">Nombre completo</label>
+                    <input class="form-input" type="text" id="nombre" name="nombre" required placeholder="Ej. Ana Milena Castro">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="correo">Correo institucional</label>
+                    <input class="form-input" type="email" id="correo" name="correo" required placeholder="ana.castro@oea.edu.co">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="rol">Rol</label>
+                    <select class="form-select" id="rol" name="rol" required>
+                        <option value="docente">Docente</option>
+                        <option value="coordinador">Coordinador(a)</option>
+                    </select>
+                </div>
+                <p style="font-size:.75rem;color:var(--gris-texto);margin-bottom:.75rem">
+                    Se generará una contraseña temporal para el primer acceso y se obligará al cambio en el primer inicio.
+                </p>
+                <button class="btn-submit" type="submit">Crear Usuario</button>
+            </form>
+        </div>
+
+        <!-- Listado de Usuarios -->
+        <div class="card">
+            <h2 class="card__titulo">Cuentas Registradas (<%= usuarios.length %>)</h2>
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th style="text-align:right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% usuarios.forEach(function(u) { %>
+                            <tr>
+                                <td>
+                                    <strong><%= u.nombre %></strong><br>
+                                    <span style="font-size:.8rem;color:var(--gris-texto)"><%= u.correo %></span>
+                                    <% if (u.curso_dirigido) { %>
+                                        <br><span style="font-size:.75rem;color:var(--azul)">Dirige curso: <%= u.curso_dirigido %></span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <span class="badge <%= u.rol === 'coordinador' ? 'badge--coordinador' : 'badge--docente' %>">
+                                        <%= u.rol %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge <%= u.activo ? 'badge--activo' : 'badge--inactivo' %>">
+                                        <%= u.activo ? 'Activo' : 'Inactivo' %>
+                                    </span>
+                                </td>
+                                <td style="text-align:right;white-space:nowrap">
+                                    <a href="/editar_usuario?id=<%= u.id %>" class="btn-accion btn-editar">Editar</a>
+
+                                    <form method="post" action="/usuarios" style="display:inline-block">
+                                        <input type="hidden" name="toggle_id" value="<%= u.id %>">
+                                        <button type="submit" class="btn-accion btn-toggle" style="color:<%= u.activo ? '#b91c1c' : '#047857' %>">
+                                            <%= u.activo ? 'Desactivar' : 'Activar' %>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const auth = urlParams.get('auth');
+    if (auth) {
+        localStorage.setItem('sipae_auth', auth);
+    }
+    const token = auth || localStorage.getItem('sipae_auth');
+    if (token) {
+        document.querySelectorAll('a[href^="/"]').forEach(function(a) {
+            const href = a.getAttribute('href');
+            if (href.startsWith('/logout')) {
+                a.addEventListener('click', function() { localStorage.removeItem('sipae_auth'); });
+                return;
+            }
+            try {
+                const u = new URL(a.href, window.location.origin);
+                if (!u.searchParams.has('auth')) {
+                    u.searchParams.set('auth', token);
+                    a.href = u.pathname + u.search + u.hash;
+                }
+            } catch(e) {}
+        });
+        document.querySelectorAll('form').forEach(function(f) {
+            if (!f.querySelector('input[name="auth"]')) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'auth';
+                inp.value = token;
+                f.appendChild(inp);
+            }
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
