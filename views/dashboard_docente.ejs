@@ -228,6 +228,15 @@
         .radio-grupo input[type="radio"] + label.est-novedad { border-color: var(--naranja); color: var(--naranja); }
         .radio-grupo input[type="radio"]:checked + label.est-novedad { background: var(--naranja); color: #fff; }
 
+        th.th-almuerzo { text-align: center; width: 140px; }
+        td.col-almuerzo { text-align: center; }
+        .radio-almuerzo { justify-content: center; }
+        .radio-almuerzo label { padding: .32rem .65rem; }
+        .radio-almuerzo input[type="radio"] + label.alm-si { border-color: #059669; color: #059669; background: #f0fdf4; }
+        .radio-almuerzo input[type="radio"]:checked + label.alm-si { background: #059669; color: #fff; }
+        .radio-almuerzo input[type="radio"] + label.alm-no { border-color: #cbd5e1; color: #64748b; background: #f8fafc; }
+        .radio-almuerzo input[type="radio"]:checked + label.alm-no { background: #64748b; color: #fff; }
+
         .form-footer {
             display: flex;
             align-items: center;
@@ -390,11 +399,15 @@
                                     <th>#</th>
                                     <th>Estudiante</th>
                                     <th>Estado de asistencia</th>
+                                    <th class="th-almuerzo">Almuerzo</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% estudiantes.forEach(function(est, i) {
                                     let estadoActual = asistenciaExistente[est.id] || 'asistió';
+                                    let tieneAlmuerzo = (typeof almuerzoExistente !== 'undefined' && almuerzoExistente[est.id] !== undefined)
+                                        ? almuerzoExistente[est.id]
+                                        : (estadoActual === 'asistió');
                                 %>
                                     <tr>
                                         <td class="num"><%= i + 1 %></td>
@@ -412,6 +425,15 @@
 
                                                 <input type="radio" id="est_<%= est.id %>_novedad" name="asistencia[<%= est.id %>]" value="novedad" <%= estadoActual === 'novedad' ? 'checked' : '' %>>
                                                 <label for="est_<%= est.id %>_novedad" class="est-novedad">Novedad</label>
+                                            </div>
+                                        </td>
+                                        <td class="col-almuerzo">
+                                            <div class="radio-grupo radio-almuerzo" role="group">
+                                                <input type="radio" id="alm_<%= est.id %>_si" name="almuerzo[<%= est.id %>]" value="1" <%= tieneAlmuerzo ? 'checked' : '' %>>
+                                                <label for="alm_<%= est.id %>_si" class="alm-si" title="Recibe almuerzo escolar">🍽️ Sí</label>
+
+                                                <input type="radio" id="alm_<%= est.id %>_no" name="almuerzo[<%= est.id %>]" value="0" <%= !tieneAlmuerzo ? 'checked' : '' %>>
+                                                <label for="alm_<%= est.id %>_no" class="alm-no" title="No recibe almuerzo escolar">No</label>
                                             </div>
                                         </td>
                                     </tr>
@@ -444,6 +466,24 @@
         form.addEventListener('submit', function (e) {
             if (!confirm('¿Desea guardar el registro de asistencia para esta sesión?')) {
                 e.preventDefault();
+            }
+        });
+
+        // Auto-sincronizar Almuerzo al marcar asistencia
+        form.addEventListener('change', function(e) {
+            const target = e.target;
+            if (target && target.name && target.name.startsWith('asistencia[')) {
+                const match = target.name.match(/asistencia\[(\d+)\]/);
+                if (match) {
+                    const estId = match[1];
+                    const almSi = document.getElementById('alm_' + estId + '_si');
+                    const almNo = document.getElementById('alm_' + estId + '_no');
+                    if (target.value === 'falla' || target.value === 'justificado') {
+                        if (almNo) almNo.checked = true;
+                    } else if (target.value === 'asistió') {
+                        if (almSi) almSi.checked = true;
+                    }
+                }
             }
         });
     }

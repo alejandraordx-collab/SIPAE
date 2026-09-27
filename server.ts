@@ -154,6 +154,7 @@ interface Asistencia {
   fecha: string; // YYYY-MM-DD
   bloque_clase: number; // 1-8
   estado: 'asistió' | 'falla' | 'justificado' | 'novedad';
+  almuerzo?: boolean;
   observacion?: string | null;
   registrado_en: string;
 }
@@ -857,6 +858,7 @@ app.get(['/dashboard_docente', '/dashboard_docente.php'], requireAuth, requireDo
 
   let estudiantes: Estudiante[] = [];
   const asistenciaExistente: Record<number, string> = {};
+  const almuerzoExistente: Record<number, boolean> = {};
 
   if (cursoSel) {
     estudiantes = db.estudiantes
@@ -868,6 +870,7 @@ app.get(['/dashboard_docente', '/dashboard_docente.php'], requireAuth, requireDo
       .filter((a) => estIds.has(a.estudiante_id) && a.fecha === fechaSel && a.bloque_clase === bloqueSel)
       .forEach((a) => {
         asistenciaExistente[a.estudiante_id] = a.estado;
+        almuerzoExistente[a.estudiante_id] = a.almuerzo !== undefined ? a.almuerzo : (a.estado === 'asistió');
       });
   }
 
@@ -892,6 +895,7 @@ app.get(['/dashboard_docente', '/dashboard_docente.php'], requireAuth, requireDo
     bloqueSel,
     estudiantes,
     asistenciaExistente,
+    almuerzoExistente,
     alerta,
   });
 });
@@ -903,6 +907,7 @@ app.post(['/procesar_asistencia', '/procesar_asistencia.php'], requireAuth, requ
   const fecha = String(req.body.fecha || '').trim();
   const bloque = Number(req.body.bloque) || 1;
   const asistencia = req.body.asistencia || {};
+  const almuerzoData = req.body.almuerzo || {};
 
   const queryRetorno = new URLSearchParams({ curso, fecha, bloque: String(bloque) }).toString();
 
@@ -923,6 +928,8 @@ app.post(['/procesar_asistencia', '/procesar_asistencia.php'], requireAuth, requ
     if (!validEstudiantes.has(estudianteId)) return;
     if (!['asistió', 'falla', 'justificado', 'novedad'].includes(estado)) return;
 
+    const tomaAlmuerzo = almuerzoData[estIdStr] === '1' || almuerzoData[estIdStr] === 'si' || almuerzoData[estIdStr] === true || (almuerzoData[estIdStr] === undefined && estado === 'asistió');
+
     // Check if record exists for estudiante+fecha+bloque
     const idx = db.asistencia.findIndex(
       (a) => a.estudiante_id === estudianteId && a.fecha === fecha && a.bloque_clase === bloque
@@ -930,6 +937,7 @@ app.post(['/procesar_asistencia', '/procesar_asistencia.php'], requireAuth, requ
 
     if (idx >= 0) {
       db.asistencia[idx].estado = estado;
+      db.asistencia[idx].almuerzo = tomaAlmuerzo;
       db.asistencia[idx].docente_id = docenteId;
       db.asistencia[idx].registrado_en = timestamp;
     } else {
@@ -940,6 +948,7 @@ app.post(['/procesar_asistencia', '/procesar_asistencia.php'], requireAuth, requ
         fecha,
         bloque_clase: bloque,
         estado,
+        almuerzo: tomaAlmuerzo,
         registrado_en: timestamp,
       });
     }
