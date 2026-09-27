@@ -1,3 +1,6 @@
 secrets.local.php
 error_log
 backup_20260927_curso/
+soportes_novedades/
+*.bak_*
+*.bak_novedad

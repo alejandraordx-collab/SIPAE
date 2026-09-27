@@ -60,6 +60,8 @@ $bloqueSel = max(1, min(8, (int)($_GET['bloque'] ?? 1))); // Entre 1 y 8
 // ── Cargar estudiantes y asistencia existente ────────────────────────────────
 $estudiantes        = [];
 $asistenciaExistente = [];   // [ estudiante_id => estado ]
+$asistenciaIdExistente = [];      // [ estudiante_id => id de asistencia ]
+$detalleNovedadExistente = [];    // [ asistencia_id => fila de novedades ]
 
 if ($cursoSel !== '') {
     // Estudiantes del curso seleccionado
@@ -77,7 +79,7 @@ if ($cursoSel !== '') {
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
         $stmtExist = $pdo->prepare(
-            "SELECT estudiante_id, estado
+            "SELECT id, estudiante_id, estado
                FROM asistencia
               WHERE estudiante_id IN ($placeholders)
                 AND fecha        = ?
@@ -87,6 +89,23 @@ if ($cursoSel !== '') {
 
         foreach ($stmtExist->fetchAll() as $row) {
             $asistenciaExistente[$row['estudiante_id']] = $row['estado'];
+            $asistenciaIdExistente[$row['estudiante_id']] = (int)$row['id'];
+        }
+
+        if (!empty($asistenciaIdExistente)) {
+            $idsAsis          = array_values($asistenciaIdExistente);
+            $placeholdersAsis = implode(',', array_fill(0, count($idsAsis), '?'));
+
+            $stmtNov = $pdo->prepare(
+                "SELECT asistencia_id, tipo, hora, observacion, soporte_nombre_original
+                   FROM novedades
+                  WHERE asistencia_id IN ($placeholdersAsis)"
+            );
+            $stmtNov->execute($idsAsis);
+
+            foreach ($stmtNov->fetchAll() as $rowNov) {
+                $detalleNovedadExistente[$rowNov['asistencia_id']] = $rowNov;
+            }
         }
     }
 }
@@ -114,6 +133,7 @@ $estados = [
     ['valor' => 'justificado','etiqueta' => 'Justif.',     'clase' => 'est-justificado'],
     ['valor' => 'novedad',    'etiqueta' => 'Novedad',     'clase' => 'est-novedad'],
 ];
+$tiposNovedad = require __DIR__ . '/tipos_novedad.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -505,6 +525,13 @@ $estados = [
             .btn-cargar { width: 100%; }
             .radio-grupo label { font-size: .7rem; padding: .3rem .6rem; }
         }
+
+        .fila-novedad-detalle td { background: #fff7ed; border-top: 1px dashed var(--gris-borde); padding: .75rem 1rem; }
+        .novedad-detalle { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; align-items: flex-end; }
+        .novedad-detalle__campo { display: flex; flex-direction: column; gap: .25rem; font-size: .85rem; }
+        .novedad-detalle__campo label { color: var(--gris-texto); font-weight: 600; }
+        .novedad-detalle__campo select, .novedad-detalle__campo input { border: 1px solid var(--gris-borde); border-radius: .4rem; padding: .4rem .5rem; font-size: .85rem; font-family: inherit; }
+        .novedad-detalle__campo--obs { flex: 1 1 220px; }
     </style>
 </head>
 <body>
@@ -644,7 +671,7 @@ $estados = [
                     Los campos ocultos pasan los datos de contexto (curso, fecha, bloque).
                     Cada estudiante aporta un input radio con name="asistencia[{id}]".
                 -->
-                <form id="form-asistencia" method="post" action="procesar_asistencia.php">
+                <form id="form-asistencia" method="post" action="procesar_asistencia.php" enctype="multipart/form-data">
 
                     <!-- Campos de contexto (no los ve el usuario) -->
                     <input type="hidden" name="curso"  value="<?= htmlspecialchars($cursoSel, ENT_QUOTES, 'UTF-8') ?>">
@@ -665,6 +692,7 @@ $estados = [
                                     $id = (int)$est['id'];
                                     // Estado pre-seleccionado: registro existente o 'asistió' por defecto
                                     $estadoActual = $asistenciaExistente[$id] ?? 'asistió';
+                        $detalleNovedad = $detalleNovedadExistente[$asistenciaIdExistente[$id] ?? 0] ?? null;
                                 ?>
                                 <tr>
                                     <td class="num"><?= $i + 1 ?></td>
@@ -700,6 +728,21 @@ $estados = [
                                         </div>
                                     </td>
                                 </tr>
+                            <tr class="fila-novedad-detalle" id="detalle-novedad-<?= $id ?>" style="<?= ($estadoActual === 'novedad') ? '' : 'display:none;' ?>">
+                                <td colspan="3">
+                                    <div class="novedad-detalle">
+                                        <div class="novedad-detalle__campo">
+                                            <label for="novedad_tipo_<?= $id ?>">Tipo de novedad</label>
+                                            <select id="novedad_tipo_<?= $id ?>" name="novedad_tipo[<?= $id ?>]">
+                                                <option value="">-- Selecciona --</option>
+                                                <?php foreach ($tiposNovedad as $tvValor => $tvEtiqueta): ?>
+                                                    <option value="<?= htmlspecialchars($tvValor, ENT_QUOTES, 'UTF-8') ?>" <?= ($detalleNovedad && $detalleNovedad['tipo'] === $tvValor) ? 'selected' : '' ?>><?= htmlspecialchars($tvEtiqueta, ENT_QUOTES, 'UTF-8') ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -735,6 +778,41 @@ $estados = [
 <script>
 (function () {
     'use strict';
+
+    // --- Detalle de novedad: mostrar/ocultar segun el estado marcado ---
+    document.querySelectorAll('.radio-grupo').forEach(function (grupo) {
+        var radios = grupo.querySelectorAll('input[type="radio"]');
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                if (!radio.checked) return;
+                var idMatch = radio.name.match(/\[(\d+)\]/);
+                if (!idMatch) return;
+                var fila = document.getElementById('detalle-novedad-' + idMatch[1]);
+                if (!fila) return;
+                fila.style.display = (radio.value === 'novedad') ? '' : 'none';
+            });
+        });
+    });
+
+    var formNovedad = document.getElementById('form-asistencia');
+    if (formNovedad) {
+        formNovedad.addEventListener('submit', function (e) {
+            var incompleta = null;
+            document.querySelectorAll('.fila-novedad-detalle').forEach(function (fila) {
+                if (fila.style.display === 'none') return;
+                var select = fila.querySelector('select[name^="novedad_tipo"]');
+                if (select && select.value === '') {
+                    incompleta = select;
+                }
+            });
+            if (incompleta) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                alert('Selecciona el tipo de novedad para los estudiantes marcados como Novedad.');
+                incompleta.focus();
+            }
+        }, true);
+    }
 
     const formAsistencia = document.getElementById('form-asistencia');
 
