@@ -22,36 +22,43 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/conexion.php';
+require_once __DIR__ . '/libs/correo.php';
+
+function generarContrasenaTemporal(int $longitud = 16): string
+{
+    $caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*';
+    $maxIndex = strlen($caracteres) - 1;
+    $resultado = '';
+
+    for ($i = 0; $i < $longitud; $i++) {
+        $resultado .= $caracteres[random_int(0, $maxIndex)];
+    }
+
+    return $resultado;
+}
 
 $nombre     = trim($_POST['nombre'] ?? '');
 $correo     = trim($_POST['correo'] ?? '');
-$contrasena = trim($_POST['contrasena'] ?? '');
 $rol        = trim($_POST['rol'] ?? '');
 
-// Validación básica: nombre y contraseña no vacíos, correo válido,
-// contraseña de al menos 8 caracteres y rol dentro de los dos permitidos.
 if (
-    $nombre === '' || $contrasena === ''
+    $nombre === ''
     || !filter_var($correo, FILTER_VALIDATE_EMAIL)
-    || strlen($contrasena) < 8
     || !in_array($rol, ['docente', 'coordinador'], true)
 ) {
     header('Location: usuarios.php?error=validacion');
     exit;
 }
 
-// password_hash() con PASSWORD_DEFAULT usa bcrypt —el mismo algoritmo que
-// password_verify() espera en login.php— y genera una sal distinta en
-// cada llamada, así que dos usuarios con la misma contraseña nunca
-// terminan con el mismo hash guardado.
-$hash = password_hash($contrasena, PASSWORD_DEFAULT);
+$temporal = generarContrasenaTemporal();
+$hash = password_hash($temporal, PASSWORD_DEFAULT);
 
 $pdo = obtenerConexion();
 
 try {
     $stmt = $pdo->prepare(
-        'INSERT INTO usuarios (nombre, correo, contrasena, rol)
-         VALUES (:nombre, :correo, :contrasena, :rol)'
+        'INSERT INTO usuarios (nombre, correo, contrasena, rol, debe_cambiar_contrasena)
+         VALUES (:nombre, :correo, :contrasena, :rol, 1)'
     );
     $stmt->execute([
         ':nombre'     => $nombre,
@@ -60,7 +67,17 @@ try {
         ':rol'        => $rol,
     ]);
 
-    header('Location: usuarios.php?guardado=1');
+    $correoEnviado = enviarCorreoCredencialTemporal(
+        $correo,
+        $nombre,
+        $temporal
+    );
+
+    if ($correoEnviado) {
+        header('Location: usuarios.php?guardado=1');
+    } else {
+        header('Location: usuarios.php?guardado=1&email_error=1');
+    }
 
 } catch (PDOException $e) {
     // Código 23000 = violación de restricción única (el correo ya existe,

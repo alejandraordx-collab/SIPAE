@@ -13,8 +13,12 @@
 
 session_start();
 
-// Si ya inició sesión antes, lo mandamos directo a su panel
+// Si ya inició sesión antes, lo mandamos directo a su panel o al cambio de contraseña
 if (isset($_SESSION['usuario_id'])) {
+    if (!empty($_SESSION['debe_cambiar_contrasena'])) {
+        header('Location: cambiar_password.php');
+        exit;
+    }
     redirigirSegunRol($_SESSION['rol']);
 }
 
@@ -37,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // escribiendo código SQL en el campo de correo.
         $pdo  = obtenerConexion();
         $stmt = $pdo->prepare(
-            'SELECT id, nombre, contrasena, rol
+            'SELECT id, nombre, contrasena, rol, debe_cambiar_contrasena
                FROM usuarios
               WHERE correo = :correo
                 AND activo = 1'
@@ -49,9 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // en la base de datos.
         if ($usuario && password_verify($contrasena, $usuario['contrasena'])) {
 
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['nombre']     = $usuario['nombre'];
-            $_SESSION['rol']        = $usuario['rol'];
+            session_regenerate_id(true);
+
+            $_SESSION['usuario_id']                 = $usuario['id'];
+            $_SESSION['nombre']                    = $usuario['nombre'];
+            $_SESSION['rol']                       = $usuario['rol'];
+            $_SESSION['debe_cambiar_contrasena']   = (bool) (int) $usuario['debe_cambiar_contrasena'];
+
+            if ((int) $usuario['debe_cambiar_contrasena'] === 1) {
+                header('Location: cambiar_password.php');
+                exit;
+            }
 
             redirigirSegunRol($usuario['rol']);
 
@@ -286,6 +298,12 @@ function redirigirSegunRol(string $rol): void
         </div>
 
         <button class="btn-primary" type="submit">Ingresar al sistema</button>
+
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="recuperar_contrasena.php" style="font-size: .85rem; color: #ee7374; text-decoration: none; font-weight: 600;">
+                ¿Olvidaste tu contraseña?
+            </a>
+        </div>
 
     </form>
 

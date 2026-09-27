@@ -65,14 +65,16 @@ try {
 
         $stmt = $pdo->prepare(
             'UPDATE usuarios
-                SET nombre = :nombre, correo = :correo, rol = :rol, curso_dirigido = :curso_dirigido, contrasena = :contrasena
+                SET nombre = :nombre, correo = :correo, rol = :rol, curso_dirigido = :curso_dirigido,
+                    contrasena = :contrasena, debe_cambiar_contrasena = 0
               WHERE id = :id'
         );
         $stmt->execute([
             ':nombre'     => $nombre,
             ':correo'     => $correo,
             ':rol'        => $rol,
-            ':contrasena' => $hash, ':curso_dirigido' => $cursoDirigido,
+            ':contrasena' => $hash,
+            ':curso_dirigido' => $cursoDirigido,
             ':id'         => $id,
         ]);
     } else {
@@ -84,7 +86,8 @@ try {
         $stmt->execute([
             ':nombre' => $nombre,
             ':correo' => $correo,
-            ':rol'    => $rol, ':curso_dirigido' => $cursoDirigido,
+            ':rol'    => $rol,
+            ':curso_dirigido' => $cursoDirigido,
             ':id'     => $id,
         ]);
     }

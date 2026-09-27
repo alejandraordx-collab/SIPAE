@@ -30,6 +30,8 @@ CREATE DATABASE IF NOT EXISTS sipae
 -- siguientes operen sobre ella.
 USE sipae;
 
+ALTER TABLE usuarios
+    ADD COLUMN IF NOT EXISTS debe_cambiar_contrasena TINYINT(1) NOT NULL DEFAULT 1;
 
 -- ==========================================================
 -- SECCIÓN 1: DEFINICIÓN DE TABLAS
@@ -62,6 +64,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     -- Permite desactivar un usuario sin eliminarlo (borrado lógico).
     -- 1 = activo, 0 = inactivo.
     activo        TINYINT(1)       NOT NULL DEFAULT 1,
+
+    -- Obliga a cambiar la contraseña al primer ingreso.
+    -- 1 = requiere cambio, 0 = ya fue actualizada.
+    debe_cambiar_contrasena TINYINT(1) NOT NULL DEFAULT 1,
 
     -- Se registra automáticamente la fecha y hora de creación de la cuenta.
     creado_en     TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -185,6 +191,20 @@ CREATE TABLE IF NOT EXISTS asistencia (
 --   'pendiente'   → creada pero el acudiente aún no fue notificado
 --   'notificado'  → el acudiente fue contactado; se registra la fecha
 -- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    usuario_id    INT UNSIGNED NOT NULL,
+    token_hash    VARCHAR(255) NOT NULL,
+    expiracion   DATETIME NOT NULL,
+    usado         TINYINT(1) NOT NULL DEFAULT 0,
+    creado_en     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_reset_usuario FOREIGN KEY (usuario_id)
+        REFERENCES usuarios (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    KEY idx_reset_expiracion (expiracion),
+    KEY idx_reset_usuario (usuario_id)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS alertas (
 
     -- Identificador único de la alerta
@@ -233,15 +253,15 @@ CREATE TABLE IF NOT EXISTS alertas (
 -- INSERT: usuarios
 -- Contraseña en texto plano de TODOS: Test1234!
 -- ----------------------------------------------------------
-INSERT INTO usuarios (nombre, correo, contrasena, rol) VALUES
+INSERT INTO usuarios (nombre, correo, contrasena, rol, debe_cambiar_contrasena) VALUES
 -- id=1 → coordinadora con visión global del sistema
-('Laura Martínez',   'laura.martinez@oea.edu.co',   'Test1234!', 'coordinador'),
+('Laura Martínez',   'laura.martinez@oea.edu.co',   '$2y$10$T6qwI6gH0iG9ul0G0s0Ege4oaL7fWvD7Ab2NOBw5qNgq4zicv2s0mK', 'coordinador', 0),
 -- id=2 → docente a cargo de grado 601
-('Carlos Herrera',   'carlos.herrera@oea.edu.co',   'Test1234!', 'docente'),
+('Carlos Herrera',   'carlos.herrera@oea.edu.co',   '$2y$10$T6qwI6gH0iG9ul0G0s0Ege4oaL7fWvD7Ab2NOBw5qNgq4zicv2s0mK', 'docente', 0),
 -- id=3 → docente a cargo de grados 701 y 901
-('Patricia Suárez',  'patricia.suarez@oea.edu.co',  'Test1234!', 'docente'),
+('Patricia Suárez',  'patricia.suarez@oea.edu.co',  '$2y$10$T6qwI6gH0iG9ul0G0s0Ege4oaL7fWvD7Ab2NOBw5qNgq4zicv2s0mK', 'docente', 0),
 -- id=4 → docente a cargo de grados 901 y 1101
-('Andrés Rodríguez', 'andres.rodriguez@oea.edu.co', 'Test1234!', 'docente');
+('Andrés Rodríguez', 'andres.rodriguez@oea.edu.co', '$2y$10$T6qwI6gH0iG9ul0G0s0Ege4oaL7fWvD7Ab2NOBw5qNgq4zicv2s0mK', 'docente', 0);
 
 
 -- ----------------------------------------------------------

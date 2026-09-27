@@ -15,6 +15,11 @@ ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
+if (!empty($_SESSION['debe_cambiar_contrasena'])) {
+    header('Location: cambiar_password.php');
+    exit;
+}
+
 // Protección: solo docentes autenticados
 if (!isset($_SESSION['usuario_id']) || $_SESSION['rol'] !== 'docente') {
     header('Location: login.php');

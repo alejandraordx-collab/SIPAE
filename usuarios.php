@@ -68,7 +68,7 @@ if (isset($_GET['guardado'])) {
 
 } elseif (isset($_GET['error'])) {
     $textos = [
-        'validacion'      => 'Revisa los datos: todos los campos son obligatorios, el correo debe ser válido y la contraseña debe tener al menos 8 caracteres.',
+        'validacion'      => 'Revisa los datos: el nombre y el correo son obligatorios y el correo debe ser válido.',
         'duplicado'       => 'Ya existe un usuario con ese correo institucional.',
         'bd'              => 'Error al guardar en la base de datos. Intenta de nuevo.',
         'auto_desactivar' => 'No puedes desactivar tu propia cuenta mientras tienes la sesión iniciada.',
@@ -370,13 +370,6 @@ $usuarios = $pdo->query(
                 </div>
 
                 <div class="campo">
-                    <label for="contrasena">Contraseña</label>
-                    <input type="password" id="contrasena" name="contrasena"
-                           minlength="8" maxlength="128" autocomplete="new-password" required>
-                    <span class="campo__ayuda">Mínimo 8 caracteres.</span>
-                </div>
-
-                <div class="campo">
                     <label for="rol">Rol</label>
                     <select id="rol" name="rol" required>
                         <option value="">— Selecciona —</option>
@@ -385,6 +378,10 @@ $usuarios = $pdo->query(
                     </select>
                 </div>
             </div>
+
+            <p class="campo__ayuda" style="margin-top: 1rem; color: var(--gris-texto);">
+                Se generará una contraseña temporal aleatoria y se enviará al correo del usuario. Al iniciar sesión deberá cambiarla obligatoriamente.
+            </p>
 
             <button type="submit" class="btn btn--verde">Crear usuario</button>
         </form>

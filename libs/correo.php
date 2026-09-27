@@ -84,6 +84,64 @@ function enviarCorreoSMTP(string $destinatario, string $asunto, string $cuerpoHt
  * Arma y envía el correo de recuperación de contraseña, con el diseño
  * visual de SIPAE (misma línea que enviar_alerta.php).
  */
+function enviarCorreoCredencialTemporal(string $destinatario, string $nombre, string $contrasenaTemporal): bool
+{
+    $asunto = 'Tu contraseña temporal de SIPAE — Colegio OEA';
+    $nombreSeguro = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
+    $fechaHoy = date('d/m/Y');
+
+    $cuerpoHtml = <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:'Segoe UI',Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:30px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)">
+        <tr>
+          <td style="background:#ee7374;padding:28px 36px">
+            <p style="margin:0;font-size:22px;font-weight:700;color:#fff">Colegio OEA</p>
+            <p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.85)">SIPAE — Sistema Integral de Permanencia, Asistencia y Alimentación Escolar</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 36px">
+            <p style="margin:0 0 16px;font-size:15px;color:#374151">Hola {$nombreSeguro},</p>
+            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6">
+              Tu cuenta en SIPAE ha sido creada. Para ingresar por primera vez, usa la siguiente contraseña temporal:
+            </p>
+            <p style="margin:0 0 20px;padding:14px 18px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;font-size:22px;font-weight:700;color:#b91c1c;letter-spacing:1px;text-align:center">
+              {$contrasenaTemporal}
+            </p>
+            <p style="margin:0;font-size:15px;color:#374151;line-height:1.6">
+              Al iniciar sesión, el sistema te pedirá cambiarla de inmediato. Esta clave es de uso único y solo sirve para acceder la primera vez.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f9fafb;padding:18px 36px;border-top:1px solid #e5e7eb">
+            <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5">
+              Este mensaje fue generado automáticamente por el sistema SIPAE del Colegio OEA.<br>
+              © {$fechaHoy} Colegio OEA — Bogotá, Colombia.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+HTML;
+
+    $cuerpoTexto = "Hola {$nombre},\n\n"
+        . "Tu cuenta en SIPAE ha sido creada. Usa la siguiente contraseña temporal para ingresar por primera vez:\n\n"
+        . "{$contrasenaTemporal}\n\n"
+        . "Al iniciar sesión, el sistema te pedirá cambiarla de inmediato.\n\n"
+        . "— Sistema SIPAE";
+
+    return enviarCorreoSMTP($destinatario, $asunto, $cuerpoHtml, $cuerpoTexto);
+}
+
 function enviarCorreoRecuperacion(string $destinatario, string $nombre, string $enlace): bool
 {
     $asunto = 'Recuperación de contraseña — SIPAE Colegio OEA';
