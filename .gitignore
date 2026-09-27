@@ -1,6 +1,14 @@
+# Dependencias y entorno Node (solo para contenedor AI Studio)
 node_modules/
 .aistudio/
 dist/
+bun.lock
+server.ts
+tsconfig.json
+package.json
+views/
+
+# Archivos de configuración local y logs PHP
 secrets.local.php
 error_log
 backup_20260927_curso/
