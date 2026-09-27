@@ -1,3 +1,7 @@
+node_modules/
+.aistudio/
+dist/
 secrets.local.php
 error_log
 backup_20260927_curso/
+.env
