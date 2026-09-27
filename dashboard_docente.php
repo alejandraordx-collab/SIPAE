@@ -33,6 +33,14 @@ require_once __DIR__ . '/conexion.php';
 
 $pdo = obtenerConexion();
 
+// ── Curso que este docente dirige (si tiene uno asignado) ──────────────────
+// Se consulta siempre a la base de datos, nunca se confía en la sesión: así,
+// si el coordinador asigna o quita el curso dirigido mientras el docente
+// tiene la sesión abierta, el cambio se refleja de inmediato.
+$stmtCursoDirigido = $pdo->prepare('SELECT curso_dirigido FROM usuarios WHERE id = :id AND activo = 1');
+$stmtCursoDirigido->execute([':id' => $_SESSION['usuario_id']]);
+$cursoDirigido = $stmtCursoDirigido->fetchColumn() ?: null;
+
 // ── Cargar lista de cursos disponibles ──────────────────────────────────────
 $stmtCursos = $pdo->query(
     'SELECT DISTINCT curso FROM estudiantes WHERE activo = 1 ORDER BY curso ASC'
@@ -86,6 +94,7 @@ if (isset($_GET['guardado'])) {
     $textos = [
         'validacion' => 'Faltan datos requeridos. Verifica el formulario.',
         'bd'         => 'Error al guardar en la base de datos. Intenta de nuevo.',
+        'sin_curso'  => 'No tienes un curso asignado como director. Contacta a coordinación si crees que esto es un error.',
     ];
     $alerta = [
         'tipo'  => 'error',
@@ -503,6 +512,11 @@ $estados = [
     </a>
 
     <div class="navbar__usuario">
+        <?php if ($cursoDirigido): ?>
+            <a href="estudiantes_docente.php" class="navbar__logout" style="background:rgba(255,255,255,.15)">
+                Mi curso (<?= htmlspecialchars($cursoDirigido, ENT_QUOTES, 'UTF-8') ?>)
+            </a>
+        <?php endif; ?>
         <div>
             <div class="navbar__nombre">
                 <?= htmlspecialchars($_SESSION['nombre'], ENT_QUOTES, 'UTF-8') ?>
@@ -546,7 +560,7 @@ $estados = [
                 <!-- Selector de curso -->
                 <div class="filtro__grupo">
                     <label class="filtro__label" for="curso">Curso</label>
-                    <select class="filtro__select" id="curso" name="curso" required>
+                    <select class="filtro__select" id="curso" name="curso" onchange="this.form.submit()" required>
                         <option value="">— Selecciona un curso —</option>
                         <?php foreach ($cursos as $c): ?>
                             <option value="<?= htmlspecialchars($c, ENT_QUOTES, 'UTF-8') ?>"

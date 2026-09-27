@@ -204,7 +204,8 @@ define('USAR_PHPMAILER', true);
 define('SMTP_HOST',     'smtp.gmail.com');     // Gmail; cambiar por el servidor del colegio
 define('SMTP_PUERTO',   587);                  // 587 = TLS, 465 = SSL
 define('SMTP_USUARIO',  'sipae.oea@gmail.com');// Cuenta remitente
-define('SMTP_CLAVE',    'ticw hvye vjhy lyvc'); // Contraseña de aplicación de Google
+if (file_exists(__DIR__ . '/secrets.local.php')) { require_once __DIR__ . '/secrets.local.php'; }
+if (!defined('SMTP_CLAVE')) define('SMTP_CLAVE', 'CAMBIAR_EN_secrets.local.php'); // Contraseña de aplicación de Google
 define('SMTP_NOMBRE',   'SIPAE — Colegio OEA');// Nombre visible en el correo
 
 $enviado = false;

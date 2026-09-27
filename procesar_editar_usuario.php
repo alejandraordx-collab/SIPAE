@@ -28,7 +28,7 @@ $id         = (int) ($_POST['id'] ?? 0);
 $nombre     = trim($_POST['nombre'] ?? '');
 $correo     = trim($_POST['correo'] ?? '');
 $rol        = trim($_POST['rol'] ?? '');
-$contrasena = trim($_POST['contrasena'] ?? '');
+$contrasena = trim($_POST['contrasena'] ?? ''); $cursoDirigido = ($rol === 'docente') ? (trim($_POST['curso_dirigido'] ?? '') ?: null) : null;
 
 $esUsuarioActual = $id === (int) $_SESSION['usuario_id'];
 
@@ -65,26 +65,26 @@ try {
 
         $stmt = $pdo->prepare(
             'UPDATE usuarios
-                SET nombre = :nombre, correo = :correo, rol = :rol, contrasena = :contrasena
+                SET nombre = :nombre, correo = :correo, rol = :rol, curso_dirigido = :curso_dirigido, contrasena = :contrasena
               WHERE id = :id'
         );
         $stmt->execute([
             ':nombre'     => $nombre,
             ':correo'     => $correo,
             ':rol'        => $rol,
-            ':contrasena' => $hash,
+            ':contrasena' => $hash, ':curso_dirigido' => $cursoDirigido,
             ':id'         => $id,
         ]);
     } else {
         $stmt = $pdo->prepare(
             'UPDATE usuarios
-                SET nombre = :nombre, correo = :correo, rol = :rol
+                SET nombre = :nombre, correo = :correo, rol = :rol, curso_dirigido = :curso_dirigido
               WHERE id = :id'
         );
         $stmt->execute([
             ':nombre' => $nombre,
             ':correo' => $correo,
-            ':rol'    => $rol,
+            ':rol'    => $rol, ':curso_dirigido' => $cursoDirigido,
             ':id'     => $id,
         ]);
     }

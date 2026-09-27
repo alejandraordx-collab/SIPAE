@@ -25,9 +25,13 @@ $pdo = obtenerConexion();
 
 $id = (int) ($_GET['id'] ?? 0);
 
-$stmt = $pdo->prepare('SELECT id, nombre, correo, rol FROM usuarios WHERE id = :id');
+$stmt = $pdo->prepare('SELECT id, nombre, correo, rol, curso_dirigido FROM usuarios WHERE id = :id');
 $stmt->execute([':id' => $id]);
 $usuario = $stmt->fetch();
+
+// --- Lista de cursos disponibles (para asignar curso_dirigido a un docente) ---
+$stmtCursos = $pdo->query('SELECT DISTINCT curso FROM estudiantes WHERE activo = 1 ORDER BY curso ASC');
+$cursos = $stmtCursos->fetchAll(PDO::FETCH_COLUMN);
 
 if (!$usuario) {
     header('Location: usuarios.php?error=no_encontrado');
@@ -245,6 +249,16 @@ if (isset($_GET['error'])) {
                     <input type="hidden" name="rol" value="<?= htmlspecialchars($usuario['rol'], ENT_QUOTES, 'UTF-8') ?>">
                     <span class="campo__ayuda">No puedes cambiar tu propio rol mientras tienes la sesión iniciada.</span>
                 <?php endif; ?>
+            </div>
+            <div class="campo" id="campo-curso-dirigido">
+                <label for="curso_dirigido">Curso que dirige (solo docentes)</label>
+                <select id="curso_dirigido" name="curso_dirigido">
+                    <option value="">— Ninguno —</option>
+                    <?php foreach ($cursos as $curso): ?>
+                    <option value="<?= htmlspecialchars($curso, ENT_QUOTES, 'UTF-8') ?>" <?= ($usuario['curso_dirigido'] === $curso) ? 'selected' : '' ?>><?= htmlspecialchars($curso, ENT_QUOTES, 'UTF-8') ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span class="campo__ayuda">Solo aplica si el rol es Docente. Si el rol es Coordinador(a), este valor se ignora.</span>
             </div>
 
             <div class="campo">

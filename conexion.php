@@ -18,9 +18,10 @@
 // ---------------------------------------------------------------------------
 define('DB_HOST',    'localhost');
 define('DB_PORT',    '3306');
-define('DB_NAME',    'sipae');
-define('DB_USER',    'root');       // Cambiar por el usuario de producción
-define('DB_PASS',    '');           // Cambiar por la contraseña real
+if (file_exists(__DIR__ . '/secrets.local.php')) { require_once __DIR__ . '/secrets.local.php'; }
+if (!defined('DB_NAME')) define('DB_NAME', 'sipae');
+if (!defined('DB_USER')) define('DB_USER', 'root');       // Cambiar por el usuario de producción
+if (!defined('DB_PASS')) define('DB_PASS', '');           // Cambiar por la contraseña real
 define('DB_CHARSET', 'utf8mb4');
 
 // ---------------------------------------------------------------------------
