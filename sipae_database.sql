@@ -155,6 +155,9 @@ CREATE TABLE IF NOT EXISTS asistencia (
     -- Estado de asistencia restringido a los cuatro valores del negocio.
     estado        ENUM('asistió','falla','justificado','novedad') NOT NULL,
 
+    -- Registro de almuerzo escolar PAE (1 = recibe, 0 = no recibe)
+    almuerzo      TINYINT(1)       NOT NULL DEFAULT 1 COMMENT '1 = Recibe almuerzo PAE, 0 = No recibe',
+
     -- Campo opcional para notas adicionales (motivo de la novedad, etc.)
     observacion   VARCHAR(255)     NULL DEFAULT NULL,
 
