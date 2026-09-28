@@ -9,11 +9,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+$secretsFile = __DIR__ . '/secrets.local.php';
+if (file_exists($secretsFile)) {
+    require_once $secretsFile;
+}
+
 $host = getenv('DB_HOST') ?: '127.0.0.1';
 $port = getenv('DB_PORT') ?: '3306';
-$dbname = getenv('DB_NAME') ?: 'sipae';
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: (defined('DB_NAME') ? DB_NAME : 'sipae');
+$user = getenv('DB_USER') ?: (defined('DB_USER') ? DB_USER : 'root');
+$pass = getenv('DB_PASS') ?: (defined('DB_PASS') ? DB_PASS : '');
 
 try {
     $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
