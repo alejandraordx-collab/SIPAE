@@ -86,6 +86,7 @@ if (isset($_GET['guardado'])) {
     <title>SIPAE — Registro de Asistencia y Almuerzo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
         :root {
             --azul-oscuro: #0f172a;
@@ -163,7 +164,7 @@ if (isset($_GET['guardado'])) {
 <nav class="navbar">
     <a href="dashboard_docente.php" class="navbar__marca">
         <span>SIPAE</span>
-        <span style="font-size:.8rem;color:var(--azul-medio);background:var(--azul-fondo);padding:2px 8px;border-radius:12px">Docente</span>
+        <span class="navbar__badge">Docente</span>
     </a>
     <div class="navbar__user">
         <span style="font-size:.85rem;font-weight:600"><?= htmlspecialchars($nombre_usuario) ?></span>

@@ -72,60 +72,14 @@ $docentesControl = $stmtDocentes->fetchAll();
     <title>SIPAE — Panel de Coordinación</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --azul-oscuro: #0f172a;
-            --azul-medio: #2563eb;
-            --azul-fondo: #eff6ff;
-            --verde: #059669;
-            --verde-fondo: #ecfdf5;
-            --rojo: #dc2626;
-            --rojo-fondo: #fef2f2;
-            --naranja: #ea580c;
-            --naranja-fondo: #fff7ed;
-            --gris-bg: #f8fafc;
-            --gris-card: #ffffff;
-            --gris-borde: #e2e8f0;
-            --gris-texto: #64748b;
-            --gris-oscuro: #1e293b;
-            --sombra: 0 4px 6px -1px rgb(0 0 0 / .07), 0 2px 4px -2px rgb(0 0 0 / .05);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gris-bg); color: var(--gris-oscuro); min-height: 100vh; }
-        
-        .navbar { background: #fff; border-bottom: 1.5px solid var(--gris-borde); padding: 0 1.5rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-        .navbar__marca { font-weight: 800; font-size: 1.15rem; color: var(--azul-oscuro); text-decoration: none; display: flex; align-items: center; gap: .5rem; }
-        .nav-links { display: flex; gap: 1rem; align-items: center; }
-        .nav-link { text-decoration: none; color: var(--gris-texto); font-weight: 600; font-size: .85rem; padding: .4rem .75rem; border-radius: 6px; }
-        .nav-link.active { color: var(--azul-medio); background: var(--azul-fondo); }
-        .btn-logout { background: none; border: 1.5px solid var(--gris-borde); color: var(--rojo); padding: .375rem .75rem; border-radius: 6px; font-weight: 600; font-size: .8rem; cursor: pointer; text-decoration: none; }
-        
-        .contenedor { max-width: 1200px; margin: 1.75rem auto; padding: 0 1rem; }
-        
-        .grid-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .kpi { background: #fff; border-radius: 12px; border: 1.5px solid var(--gris-borde); box-shadow: var(--sombra); padding: 1.25rem; display: flex; flex-direction: column; }
-        .kpi__valor { font-size: 2rem; font-weight: 800; color: var(--azul-oscuro); margin-bottom: .25rem; }
-        .kpi__etiqueta { font-size: .85rem; font-weight: 700; color: var(--gris-texto); text-transform: uppercase; letter-spacing: .04em; }
-        
-        .grid-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
-        .card { background: #fff; border-radius: 12px; border: 1.5px solid var(--gris-borde); box-shadow: var(--sombra); padding: 1.5rem; }
-        .card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
-        .card__titulo { font-size: 1rem; font-weight: 700; }
-        .badge { padding: .25rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 700; }
-        .badge--verde { background: var(--verde-fondo); color: var(--verde); }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; color: var(--gris-texto); font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: .65rem .75rem; text-align: left; border-bottom: 1.5px solid var(--gris-borde); }
-        td { padding: .65rem .75rem; border-bottom: 1px solid #f1f5f9; font-size: .85rem; }
-        .chip-almuerzo { background: #d1fae5; color: #047857; padding: .2rem .5rem; border-radius: 6px; font-weight: 700; font-size: .78rem; display: inline-block; }
-    </style>
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
 
 <nav class="navbar">
     <a href="dashboard_coordinador.php" class="navbar__marca">
         <span>SIPAE</span>
-        <span style="font-size:.8rem;color:var(--azul-medio);background:var(--azul-fondo);padding:2px 8px;border-radius:12px">Coordinación</span>
+        <span class="navbar__badge">Coordinación</span>
     </a>
     <div class="nav-links">
         <a href="dashboard_coordinador.php" class="nav-link active">Panel General</a>
@@ -160,7 +114,7 @@ $docentesControl = $stmtDocentes->fetchAll();
         <div class="card">
             <div class="card__header">
                 <div class="card__titulo">Alimentación Escolar (PAE) — Hoy</div>
-                <span class="badge badge--verde"><?= $kpiAlmuerzosHoy ?> <?= $kpiAlmuerzosHoy === 1 ? 'almuerzo' : 'almuerzos' ?></span>
+                <span class="badge-pill-green"><?= $kpiAlmuerzosHoy ?> <?= $kpiAlmuerzosHoy === 1 ? 'almuerzo' : 'almuerzos' ?></span>
             </div>
             <table>
                 <thead>
@@ -176,7 +130,7 @@ $docentesControl = $stmtDocentes->fetchAll();
                         <tr>
                             <td><strong>Curso <?= htmlspecialchars($p['curso']) ?></strong></td>
                             <td style="text-align:right">
-                                <span class="chip-almuerzo">
+                                <span class="badge-pill-green">
                                     <?= $total ?> <?= $total === 1 ? 'almuerzo' : 'almuerzos' ?>
                                 </span>
                             </td>
@@ -206,9 +160,9 @@ $docentesControl = $stmtDocentes->fetchAll();
                             <td>Curso <?= htmlspecialchars($d['curso_dirigido'] ?? 'Sin curso') ?></td>
                             <td>
                                 <?php if ($d['registros_hoy'] > 0): ?>
-                                    <span class="badge badge--verde">Registrado</span>
+                                    <span class="badge-pill-green">Registrado</span>
                                 <?php else: ?>
-                                    <span style="color:var(--naranja);font-weight:700">Pendiente</span>
+                                    <span class="badge-pill-orange">Pendiente</span>
                                 <?php endif; ?>
                             </td>
                         </tr>

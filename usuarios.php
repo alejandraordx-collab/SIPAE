@@ -39,6 +39,7 @@ $usuarios = $pdo->query("SELECT id, nombre, correo, rol, curso_dirigido, activo,
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIPAE — Gestión de Usuarios</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
         :root { --azul-oscuro: #0f172a; --azul-medio: #2563eb; --gris-bg: #f8fafc; --gris-borde: #e2e8f0; --gris-texto: #64748b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
