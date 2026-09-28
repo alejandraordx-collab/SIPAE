@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .login-header h1 { font-size: 1.75rem; font-weight: 800; color: #0f172a; letter-spacing: -.03em; }
         .login-header p { color: #64748b; font-size: .88rem; margin-top: .35rem; }
         .campo { margin-bottom: 1.25rem; }
-        .campo label { display: block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #475569; margin-bottom: .4rem; }
+        .campo label { display: block; font-size: .8rem; font-weight: 700; color: #475569; margin-bottom: .4rem; }
         .campo input { width: 100%; padding: .75rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: .95rem; font-family: inherit; }
         .campo input:focus { outline: none; border-color: #ee7374; ring: 2px solid #bfdbfe; }
         .btn-submit { width: 100%; padding: .85rem; background: #ee7374; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: .95rem; cursor: pointer; margin-top: .5rem; }
@@ -85,6 +85,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .credenciales-demo { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f1f5f9; font-size: .78rem; color: #64748b; }
         .login-logo { width: 88px; height: 88px; border-radius: 16px; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto .75rem; box-shadow: 0 2px 10px rgba(0,0,0,.10); }
         .login-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .forgot-link { display: block; text-align: center; color: #ee7374; font-size: .85rem; font-weight: 600; text-decoration: none; margin-top: .1rem; }
+        .forgot-link:hover { text-decoration: underline; }
+        .quick-access { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f1f5f9; }
+        .quick-access__title { font-size: .78rem; color: #64748b; margin-bottom: .6rem; }
+        .quick-access__title code { background: #f1f5f9; padding: .1rem .35rem; border-radius: 4px; font-size: .75rem; }
+        .quick-access__buttons { display: flex; gap: .6rem; }
+        .quick-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: .4rem; padding: .6rem .5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; color: #334155; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .quick-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .quick-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -93,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-header">
             <div class="login-logo"><img src="img/logo.jpg" alt="Logo de SIPAE - Colegio OEA"></div>
         <h1>SIPAE</h1>
-        <p>Sistema de Asistencia y Alimentación Escolar (Colegio OEA)</p>
+        <p>Colegio OEA — Inicio de sesión</p>
     </div>
 
     <?php if (!empty($error)): ?>
@@ -102,8 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="post" action="login.php">
         <div class="campo">
-            <label for="correo">Correo Institucional</label>
-            <input type="email" id="correo" name="correo" required placeholder="nombre@oea.edu.co" value="<?= htmlspecialchars($_POST['correo'] ?? '') ?>">
+            <label for="correo">Correo institucional o usuario</label>
+            <input type="email" id="correo" name="correo" required placeholder="usuario@oea.edu.co" value="<?= htmlspecialchars($_POST['correo'] ?? '') ?>">
         </div>
 
         <div class="campo">
@@ -111,15 +120,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" id="contrasena" name="contrasena" required placeholder="••••••••">
         </div>
 
-        <button type="submit" class="btn-submit">Ingresar al Sistema</button>
+        <button type="submit" class="btn-submit">Ingresar al sistema</button>
     </form>
 
-    <div class="credenciales-demo">
-        <p style="font-weight:700;margin-bottom:.25rem">Cuentas de prueba:</p>
-        <p>Docente: <code>carlos.herrera@oea.edu.co</code></p>
-        <p>Coordinador: <code>laura.martinez@oea.edu.co</code></p>
-        <p>Clave: <code>Test1234!</code></p>
+    <a href="recuperar_contrasena.php" class="forgot-link">¿Olvidaste tu contraseña?</a>
+
+    <div class="quick-access">
+        <p class="quick-access__title">Acceso de prueba rápido: (Contraseña: <code>Test1234!</code>)</p>
+        <div class="quick-access__buttons">
+            <button type="button" class="quick-btn" onclick="loginRapido('laura.martinez@oea.edu.co')"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>Coordinador (Laura)</button>
+            <button type="button" class="quick-btn" onclick="loginRapido('carlos.herrera@oea.edu.co')"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>Docente (Carlos)</button>
+        </div>
     </div>
+    <script>
+    function loginRapido(correo) {
+        document.getElementById('correo').value = correo;
+        document.getElementById('contrasena').value = 'Test1234!';
+    }
+    </script>
 </div>
 
 </body>
