@@ -179,7 +179,7 @@ if (isset($_GET['guardado'])) {
             <div class="filtros-grid">
                 <div class="filtro__grupo">
                     <label class="filtro__label" for="curso">Curso</label>
-                    <select class="filtro__select" id="curso" name="curso">
+                    <select class="filtro__select" id="curso" name="curso" onchange="this.form.submit()">
                         <?php foreach ($cursos as $c): ?>
                             <option value="<?= htmlspecialchars($c) ?>" <?= $c === $cursoSel ? 'selected' : '' ?>>
                                 Curso <?= htmlspecialchars($c) ?>

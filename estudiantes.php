@@ -103,7 +103,7 @@ $cursosList = $pdo->query("SELECT DISTINCT curso FROM estudiantes ORDER BY curso
     <div class="card">
         <h2 style="font-size:1.1rem;margin-bottom:1rem">Directorio de Estudiantes</h2>
         <form method="get" action="estudiantes.php" style="display:flex;gap:1rem;flex-wrap:wrap">
-            <select name="curso" class="input">
+            <select name="curso" class="input" onchange="this.form.submit()">
                 <option value="">Todos los cursos</option>
                 <?php foreach ($cursosList as $c): ?>
                     <option value="<?= htmlspecialchars($c) ?>" <?= $c === $cursoFiltro ? 'selected' : '' ?>>Curso <?= htmlspecialchars($c) ?></option>
