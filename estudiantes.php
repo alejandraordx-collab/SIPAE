@@ -95,6 +95,7 @@ $cursosList = $pdo->query("SELECT DISTINCT curso FROM estudiantes ORDER BY curso
         <a href="dashboard_coordinador.php" class="nav-link">Panel General</a>
         <a href="estudiantes.php" class="nav-link active">Estudiantes</a>
         <a href="usuarios.php" class="nav-link">Usuarios</a>
+            <a href="base_datos.php" class="nav-link">Base de Datos</a>
         <a href="logout.php" style="color:var(--rojo);font-size:.8rem;font-weight:600;text-decoration:none">Cerrar sesión</a>
     </div>
 </nav>

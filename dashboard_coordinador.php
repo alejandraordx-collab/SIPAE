@@ -86,6 +86,7 @@ $docentesControl = $stmtDocentes->fetchAll();
         <a href="dashboard_coordinador.php" class="nav-link active">Panel General</a>
         <a href="estudiantes.php" class="nav-link">Estudiantes</a>
         <a href="usuarios.php" class="nav-link">Usuarios</a>
+            <a href="base_datos.php" class="nav-link">Base de Datos</a>
         <a href="logout.php" class="btn-logout">Cerrar sesión</a>
     </div>
 </nav>

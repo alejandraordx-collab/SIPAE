@@ -63,6 +63,7 @@ $usuarios = $pdo->query("SELECT id, nombre, correo, rol, curso_dirigido, activo,
         <a href="dashboard_coordinador.php" class="nav-link">Panel General</a>
         <a href="estudiantes.php" class="nav-link">Estudiantes</a>
         <a href="usuarios.php" class="nav-link active">Usuarios</a>
+            <a href="base_datos.php" class="nav-link">Base de Datos</a>
         <a href="logout.php" style="color:#dc2626;font-size:.8rem;font-weight:600;text-decoration:none">Cerrar sesión</a>
     </div>
 </nav>
