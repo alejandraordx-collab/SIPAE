@@ -78,9 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .campo { margin-bottom: 1.25rem; }
         .campo label { display: block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #475569; margin-bottom: .4rem; }
         .campo input { width: 100%; padding: .75rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: .95rem; font-family: inherit; }
-        .campo input:focus { outline: none; border-color: #2563eb; ring: 2px solid #bfdbfe; }
-        .btn-submit { width: 100%; padding: .85rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: .95rem; cursor: pointer; margin-top: .5rem; }
-        .btn-submit:hover { background: #1d4ed8; }
+        .campo input:focus { outline: none; border-color: #ee7374; ring: 2px solid #bfdbfe; }
+        .btn-submit { width: 100%; padding: .85rem; background: #ee7374; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: .95rem; cursor: pointer; margin-top: .5rem; }
+        .btn-submit:hover { background: #ca6263; }
         .error-msg { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: .75rem; border-radius: 8px; font-size: .85rem; margin-bottom: 1.25rem; }
         .credenciales-demo { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f1f5f9; font-size: .78rem; color: #64748b; }
     </style>

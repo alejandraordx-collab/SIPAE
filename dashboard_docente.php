@@ -90,10 +90,10 @@ if (isset($_GET['guardado'])) {
     <style>
         :root {
             --azul-oscuro: #0f172a;
-            --azul-marino: #1e3a8a;
-            --azul-medio: #2563eb;
-            --azul-claro: #3b82f6;
-            --azul-fondo: #eff6ff;
+            --azul-marino: #ca6263;
+            --azul-medio: #ee7374;
+            --azul-claro: #ee7374;
+            --azul-fondo: #fbe3e1;
             --verde: #059669;
             --verde-fondo: #ecfdf5;
             --rojo: #dc2626;

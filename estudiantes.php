@@ -67,7 +67,7 @@ $cursosList = $pdo->query("SELECT DISTINCT curso FROM estudiantes ORDER BY curso
     <link rel="stylesheet" href="css/estilos.css">
     <style>
         :root {
-            --azul-oscuro: #0f172a; --azul-medio: #2563eb; --azul-fondo: #eff6ff;
+            --azul-oscuro: #0f172a; --azul-medio: #ee7374; --azul-fondo: #fbe3e1;
             --verde: #059669; --rojo: #dc2626; --gris-bg: #f8fafc;
             --gris-card: #ffffff; --gris-borde: #e2e8f0; --gris-texto: #64748b;
         }

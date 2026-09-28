@@ -41,13 +41,13 @@ $usuarios = $pdo->query("SELECT id, nombre, correo, rol, curso_dirigido, activo,
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/estilos.css">
     <style>
-        :root { --azul-oscuro: #0f172a; --azul-medio: #2563eb; --gris-bg: #f8fafc; --gris-borde: #e2e8f0; --gris-texto: #64748b; }
+        :root { --azul-oscuro: #0f172a; --azul-medio: #ee7374; --gris-bg: #f8fafc; --gris-borde: #e2e8f0; --gris-texto: #64748b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gris-bg); color: var(--azul-oscuro); }
         .navbar { background: #fff; border-bottom: 1.5px solid var(--gris-borde); padding: 0 1.5rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
         .nav-links { display: flex; gap: 1rem; align-items: center; }
         .nav-link { text-decoration: none; color: var(--gris-texto); font-weight: 600; font-size: .85rem; padding: .4rem .75rem; border-radius: 6px; }
-        .nav-link.active { color: var(--azul-medio); background: #eff6ff; }
+        .nav-link.active { color: var(--azul-medio); background: #fbe3e1; }
         .contenedor { max-width: 1200px; margin: 1.75rem auto; padding: 0 1rem; }
         .card { background: #fff; border-radius: 12px; border: 1.5px solid var(--gris-borde); padding: 1.5rem; margin-bottom: 1.5rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }

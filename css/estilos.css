@@ -16,9 +16,9 @@
     --text-body: #1e293b;
     --text-muted: #64748b;
     
-    --blue-primary: #2563eb;
-    --blue-hover: #1d4ed8;
-    --blue-light: #eff6ff;
+    --blue-primary: #ee7374;
+    --blue-hover: #ca6263;
+    --blue-light: #fbe3e1;
     
     --green-bg: #dcfce7;
     --green-text: #15803d;
@@ -340,12 +340,12 @@ tr:last-child td {
 }
 
 .radio-grupo input[type="radio"] + label.est-justificado {
-    border-color: #2563eb;
-    color: #2563eb;
-    background: #eff6ff;
+    border-color: #ee7374;
+    color: #ee7374;
+    background: #fbe3e1;
 }
 .radio-grupo input[type="radio"]:checked + label.est-justificado {
-    background: #2563eb;
+    background: #ee7374;
     color: #ffffff;
 }
 
