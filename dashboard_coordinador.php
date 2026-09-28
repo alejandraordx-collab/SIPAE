@@ -78,6 +78,7 @@ $docentesControl = $stmtDocentes->fetchAll();
 
 <nav class="navbar">
     <a href="dashboard_coordinador.php" class="navbar__marca">
+            <img src="img/logo.jpg" alt="Logo SIPAE">
         <span>SIPAE</span>
         <span class="navbar__badge">Coordinación</span>
     </a>

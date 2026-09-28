@@ -163,6 +163,7 @@ if (isset($_GET['guardado'])) {
 
 <nav class="navbar">
     <a href="dashboard_docente.php" class="navbar__marca">
+            <img src="img/logo.jpg" alt="Logo SIPAE">
         <span>SIPAE</span>
         <span class="navbar__badge">Docente</span>
     </a>

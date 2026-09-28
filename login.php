@@ -83,12 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-submit:hover { background: #ca6263; }
         .error-msg { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: .75rem; border-radius: 8px; font-size: .85rem; margin-bottom: 1.25rem; }
         .credenciales-demo { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f1f5f9; font-size: .78rem; color: #64748b; }
+        .login-logo { width: 88px; height: 88px; border-radius: 16px; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto .75rem; box-shadow: 0 2px 10px rgba(0,0,0,.10); }
+        .login-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
     <div class="login-header">
+            <div class="login-logo"><img src="img/logo.jpg" alt="Logo de SIPAE - Colegio OEA"></div>
         <h1>SIPAE</h1>
         <p>Sistema de Asistencia y Alimentación Escolar (Colegio OEA)</p>
     </div>

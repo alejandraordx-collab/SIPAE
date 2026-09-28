@@ -404,3 +404,20 @@ tr:last-child td {
         padding: 0 1rem;
     }
 }
+
+.navbar__marca img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; display: block; }
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 560px;
+    height: 560px;
+    transform: translate(-50%, -50%);
+    background: url('img/marca_agua.png') no-repeat center center;
+    background-size: contain;
+    opacity: .05;
+    pointer-events: none;
+    z-index: -1;
+}
